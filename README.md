@@ -23,6 +23,42 @@ cp project/* /var/www/html
 6. `application/config/database.php` faylidan mysql ma'lumotlarini kiriting.
 7. `application/config/config.php` faylidan `base_url` ni loyiha uchun ajratilagn domenga almashtiring.
 
+## Statistika uchun cronjob:
+
+```
+0 * * * * /usr/bin/php /var/www/html/index.php crone stats > /dev/null 2>&1
+```
+
+## SystemD
+
+Botlar uchun bildirishnomalarni yuborish uchun loyiha uchun alohida `service` yaratish lozim:
+
+```
+nano /etc/systemd/system/openbudget.service	
+```
+
+```
+[Unit]
+Description=Openbudget service
+After=mysql.service
+StartLimitIntervalSec=0
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=root
+ExecStart=/usr/bin/php  /var/www/html/index.php crone notifications
+
+[Install]
+WantedBy=multi-user.target
+```
+
+```
+systemctl start openbudget
+systemctl enable openbudget
+systemctl status openbudget
+```
+
 ## VPN sozlamalari
 
 Agarda siz loyihani O'zbekistondan tashqarida bo'lgan serverga o'rnatsangiz siz uchun alohida tas'ix ulanish kerak bo'ladi. Chunki openbudget.uz serverlari uchun tashqi trafiklar cheklangan. Shu sababli ushbu muammodan qochishning eng oson yo'li asosiy server va O'zbekistonda joylashgan istalgan tarmoq orasida tunnel hosil qilish hisoblanadi.
